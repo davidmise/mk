@@ -52,7 +52,15 @@ class BookingController extends Controller
         $roomTypes = RoomType::active()->get();
         $sources = Booking::getSources();
 
-        return view('admin.bookings.index', compact('bookings', 'roomTypes', 'sources'));
+        // Calculate stats for the dashboard cards
+        $stats = [
+            'pending' => Booking::where('status', 'pending')->count(),
+            'confirmed' => Booking::where('status', 'confirmed')->count(),
+            'checked_in' => Booking::where('status', 'checked_in')->count(),
+            'arrivals_today' => Booking::whereDate('check_in', today())->whereIn('status', ['pending', 'confirmed'])->count(),
+        ];
+
+        return view('admin.bookings.index', compact('bookings', 'roomTypes', 'sources', 'stats'));
     }
 
     /**

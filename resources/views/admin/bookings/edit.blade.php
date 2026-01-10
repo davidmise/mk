@@ -117,7 +117,7 @@
                                         <option value="{{ $type->id }}"
                                                 data-price="{{ $type->base_price }}"
                                                 {{ old('room_type_id', $booking->room_type_id) == $type->id ? 'selected' : '' }}>
-                                            {{ $type->name }} - ${{ number_format($type->base_price, 0) }}/night
+                                            {{ $type->name }} - TZS {{ number_format($type->base_price, 0) }}/night
                                         </option>
                                     @endforeach
                                 </select>
@@ -158,9 +158,9 @@
                             <div class="form-group">
                                 <label class="form-label">Nightly Rate <span class="text-danger">*</span></label>
                                 <div class="input-group">
-                                    <span class="input-group-text">$</span>
+                                    <span class="input-group-text">TZS</span>
                                     <input type="number" name="nightly_rate" id="nightlyRate" class="form-control @error('nightly_rate') is-invalid @enderror"
-                                           value="{{ old('nightly_rate', $booking->nightly_rate) }}" min="0" step="0.01" required>
+                                           value="{{ old('nightly_rate', $booking->nightly_rate) }}" min="0" step="1" required>
                                 </div>
                                 @error('nightly_rate')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -171,9 +171,9 @@
                             <div class="form-group">
                                 <label class="form-label">Discount</label>
                                 <div class="input-group">
-                                    <span class="input-group-text">$</span>
+                                    <span class="input-group-text">TZS</span>
                                     <input type="number" name="discount" class="form-control @error('discount') is-invalid @enderror"
-                                           value="{{ old('discount', $booking->discount ?? 0) }}" min="0" step="0.01">
+                                           value="{{ old('discount', $booking->discount ?? 0) }}" min="0" step="1">
                                 </div>
                                 @error('discount')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -184,9 +184,9 @@
                             <div class="form-group">
                                 <label class="form-label">Extra Charges</label>
                                 <div class="input-group">
-                                    <span class="input-group-text">$</span>
+                                    <span class="input-group-text">TZS</span>
                                     <input type="number" name="extra_charges" class="form-control @error('extra_charges') is-invalid @enderror"
-                                           value="{{ old('extra_charges', $booking->extra_charges ?? 0) }}" min="0" step="0.01">
+                                           value="{{ old('extra_charges', $booking->extra_charges ?? 0) }}" min="0" step="1">
                                 </div>
                                 @error('extra_charges')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -210,7 +210,7 @@
                             <div class="form-group">
                                 <label class="form-label">Tax Amount</label>
                                 <div class="input-group">
-                                    <span class="input-group-text">$</span>
+                                    <span class="input-group-text">TZS</span>
                                     <input type="number" name="tax_amount" id="taxAmount" class="form-control"
                                            value="{{ old('tax_amount', $booking->tax_amount ?? 0) }}" readonly>
                                 </div>
@@ -220,7 +220,7 @@
                             <div class="form-group">
                                 <label class="form-label">Total Amount</label>
                                 <div class="input-group">
-                                    <span class="input-group-text">$</span>
+                                    <span class="input-group-text">TZS</span>
                                     <input type="number" name="total_amount" id="totalAmount" class="form-control"
                                            value="{{ old('total_amount', $booking->total_amount) }}" readonly style="font-weight: 600;">
                                 </div>
@@ -335,9 +335,9 @@
                     <div class="form-group mb-0">
                         <label class="form-label">Amount Paid</label>
                         <div class="input-group">
-                            <span class="input-group-text">$</span>
+                            <span class="input-group-text">TZS</span>
                             <input type="number" name="amount_paid" class="form-control @error('amount_paid') is-invalid @enderror"
-                                   value="{{ old('amount_paid', $booking->amount_paid ?? 0) }}" min="0" step="0.01">
+                                   value="{{ old('amount_paid', $booking->amount_paid ?? 0) }}" min="0" step="1">
                         </div>
                         @error('amount_paid')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -359,23 +359,23 @@
                         </div>
                         <div class="d-flex justify-between py-2" style="border-bottom: 1px solid var(--gray-100);">
                             <span class="text-muted">Room Total</span>
-                            <span id="summaryRoomTotal">${{ number_format($booking->nightly_rate * $booking->nights, 2) }}</span>
+                            <span id="summaryRoomTotal">TZS {{ number_format(($booking->nightly_rate ?? 0) * ($booking->nights ?? 1), 0) }}</span>
                         </div>
                         <div class="d-flex justify-between py-2" style="border-bottom: 1px solid var(--gray-100);">
                             <span class="text-muted">Discount</span>
-                            <span id="summaryDiscount" class="text-danger">-${{ number_format($booking->discount ?? 0, 2) }}</span>
+                            <span id="summaryDiscount" class="text-danger">-TZS {{ number_format($booking->discount ?? 0, 0) }}</span>
                         </div>
                         <div class="d-flex justify-between py-2" style="border-bottom: 1px solid var(--gray-100);">
                             <span class="text-muted">Extra Charges</span>
-                            <span id="summaryExtras">${{ number_format($booking->extra_charges ?? 0, 2) }}</span>
+                            <span id="summaryExtras">TZS {{ number_format($booking->extra_charges ?? 0, 0) }}</span>
                         </div>
                         <div class="d-flex justify-between py-2" style="border-bottom: 1px solid var(--gray-100);">
                             <span class="text-muted">Tax</span>
-                            <span id="summaryTax">${{ number_format($booking->tax_amount ?? 0, 2) }}</span>
+                            <span id="summaryTax">TZS {{ number_format($booking->tax_amount ?? 0, 0) }}</span>
                         </div>
                         <div class="d-flex justify-between py-2" style="font-size: 1.125rem; font-weight: 600;">
                             <span>Total</span>
-                            <span id="summaryTotal" class="text-primary">${{ number_format($booking->total_amount, 2) }}</span>
+                            <span id="summaryTotal" class="text-primary">TZS {{ number_format($booking->total_amount ?? 0, 0) }}</span>
                         </div>
                     </div>
                 </div>
@@ -452,11 +452,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Update summary
         summaryNights.textContent = nights;
-        summaryRoomTotal.textContent = '$' + roomTotal.toFixed(2);
-        summaryDiscount.textContent = '-$' + discount.toFixed(2);
-        summaryExtras.textContent = '$' + extras.toFixed(2);
-        summaryTax.textContent = '$' + taxAmount.toFixed(2);
-        summaryTotal.textContent = '$' + total.toFixed(2);
+        summaryRoomTotal.textContent = 'TZS ' + roomTotal.toLocaleString();
+        summaryDiscount.textContent = '-TZS ' + discount.toLocaleString();
+        summaryExtras.textContent = 'TZS ' + extras.toLocaleString();
+        summaryTax.textContent = 'TZS ' + taxAmount.toLocaleString();
+        summaryTotal.textContent = 'TZS ' + total.toLocaleString();
     }
 
     // Filter rooms by room type

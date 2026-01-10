@@ -275,7 +275,7 @@
                             <option value="">Select Room</option>
                             @foreach($rooms ?? [] as $room)
                                 <option value="{{ $room->id }}">
-                                    {{ $room->room_number }} - {{ $room->roomType->name ?? 'N/A' }} (${{ number_format($room->roomType->base_price ?? 0, 0) }}/night)
+                                    {{ $room->room_number }} - {{ $room->roomType->name ?? 'N/A' }} (TZS {{ number_format($room->roomType->base_price ?? 0, 0) }}/night)
                                 </option>
                             @endforeach
                         </select>

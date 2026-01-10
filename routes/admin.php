@@ -188,6 +188,11 @@ Route::middleware(['admin.auth'])->group(function () {
         Route::post('bookings/{booking}/assign-room', [BookingController::class, 'assignRoom'])->name('admin.bookings.assign-room');
         Route::post('bookings/{booking}/add-payment', [BookingController::class, 'addPayment'])->name('admin.bookings.add-payment');
         Route::post('bookings/{booking}/add-extra', [BookingController::class, 'addExtra'])->name('admin.bookings.add-extra');
+
+        // Payment routes
+        Route::post('payments', [\App\Http\Controllers\Admin\PaymentController::class, 'store'])->name('admin.payments.store');
+        Route::patch('payments/{payment}/status', [\App\Http\Controllers\Admin\PaymentController::class, 'updateStatus'])->name('admin.payments.update-status');
+        Route::post('payments/{payment}/refund', [\App\Http\Controllers\Admin\PaymentController::class, 'refund'])->name('admin.payments.refund');
     });
 
     Route::middleware('permission:bookings.delete')->group(function () {

@@ -82,7 +82,7 @@
                                             data-price="{{ $type->base_price_per_night }}"
                                             {{ old('room_type_id', request('room_type_id')) == $type->id ? 'selected' : '' }}
                                         >
-                                            {{ $type->name }} - ${{ number_format($type->base_price_per_night, 2) }}/night
+                                            {{ $type->name }} - TZS {{ number_format($type->base_price_per_night, 0) }}/night
                                         </option>
                                     @endforeach
                                 </select>
@@ -344,22 +344,22 @@
 
                         <div class="d-flex justify-between mb-2">
                             <span class="text-muted">Room Rate:</span>
-                            <span id="summaryRoomRate">$0.00</span>
+                            <span id="summaryRoomRate">TZS 0</span>
                         </div>
                         <div class="d-flex justify-between mb-2">
                             <span class="text-muted">Subtotal:</span>
-                            <span id="summarySubtotal">$0.00</span>
+                            <span id="summarySubtotal">TZS 0</span>
                         </div>
                         <div class="d-flex justify-between mb-2">
                             <span class="text-muted">Tax (10%):</span>
-                            <span id="summaryTax">$0.00</span>
+                            <span id="summaryTax">TZS 0</span>
                         </div>
 
                         <hr>
 
                         <div class="d-flex justify-between mb-3">
                             <strong>Total Amount:</strong>
-                            <strong id="summaryTotal" style="font-size: 1.25rem; color: var(--primary);">$0.00</strong>
+                            <strong id="summaryTotal" style="font-size: 1.25rem; color: var(--primary);">TZS 0</strong>
                         </div>
 
                         <input type="hidden" name="room_rate" id="roomRateInput">
@@ -442,10 +442,10 @@ document.addEventListener('DOMContentLoaded', function() {
         let tax = subtotal * taxRate;
         let total = subtotal + tax;
 
-        document.getElementById('summaryRoomRate').textContent = '$' + roomRate.toFixed(2) + '/night';
-        document.getElementById('summarySubtotal').textContent = '$' + subtotal.toFixed(2);
-        document.getElementById('summaryTax').textContent = '$' + tax.toFixed(2);
-        document.getElementById('summaryTotal').textContent = '$' + total.toFixed(2);
+        document.getElementById('summaryRoomRate').textContent = 'TZS ' + roomRate.toLocaleString() + '/night';
+        document.getElementById('summarySubtotal').textContent = 'TZS ' + subtotal.toLocaleString();
+        document.getElementById('summaryTax').textContent = 'TZS ' + Math.round(tax).toLocaleString();
+        document.getElementById('summaryTotal').textContent = 'TZS ' + Math.round(total).toLocaleString();
 
         // Update hidden inputs
         document.getElementById('roomRateInput').value = roomRate;

@@ -70,9 +70,9 @@
         </div>
         <div class="stat-content">
             <div class="stat-label">Today's Revenue</div>
-            <div class="stat-value">${{ number_format($todayRevenue, 2) }}</div>
+            <div class="stat-value">TZS {{ number_format($todayRevenue, 0) }}</div>
             <div class="stat-change up">
-                <i class="fas fa-arrow-up"></i> Monthly: ${{ number_format($monthlyRevenue, 2) }}
+                <i class="fas fa-arrow-up"></i> Monthly: TZS {{ number_format($monthlyRevenue, 0) }}
             </div>
         </div>
     </div>
@@ -219,9 +219,9 @@
                                 </td>
                                 <td>{{ $booking->room?->room_number ?? $booking->roomType->name }}</td>
                                 <td>
-                                    @php $balance = $booking->total_amount - $booking->paid_amount @endphp
+                                    @php $balance = ($booking->total_amount ?? 0) - ($booking->paid_amount ?? 0) @endphp
                                     @if($balance > 0)
-                                        <span class="text-danger">${{ number_format($balance, 2) }}</span>
+                                        <span class="text-danger">TZS {{ number_format($balance, 0) }}</span>
                                     @else
                                         <span class="text-success">Paid</span>
                                     @endif
@@ -474,7 +474,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <select name="room_type_id" class="form-control" id="roomTypeSelect" required>
                                 <option value="">-- Select Room Type --</option>
                                 @foreach(\App\Models\RoomType::active()->get() as $roomType)
-                                    <option value="{{ $roomType->id }}">{{ $roomType->name }} - ${{ number_format($roomType->base_price, 2) }}</option>
+                                    <option value="{{ $roomType->id }}">{{ $roomType->name }} - TZS {{ number_format($roomType->base_price, 0) }}</option>
                                 @endforeach
                             </select>
                         </div>
