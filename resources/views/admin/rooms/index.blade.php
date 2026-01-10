@@ -196,7 +196,7 @@
                     </div>
                     <div class="d-flex justify-between">
                         <span class="text-muted">Check-out:</span>
-                        <strong>{{ $room->currentBooking->check_out_date->format('M d') }}</strong>
+                        <strong>{{ $room->currentBooking->check_out ? $room->currentBooking->check_out->format('M d') : '-' }}</strong>
                     </div>
                 </div>
                 @endif

@@ -114,7 +114,7 @@
                             @if($booking)
                                 <div class="booking-bar status-{{ $booking->status }}"
                                      data-booking-id="{{ $booking->id }}"
-                                     title="{{ $booking->guest->full_name ?? 'Guest' }} - {{ $booking->check_in_date->format('M d') }} to {{ $booking->check_out_date->format('M d') }}">
+                                     title="{{ $booking->guest->full_name ?? 'Guest' }} - {{ $booking->check_in ? $booking->check_in->format('M d') : '-' }} to {{ $booking->check_out ? $booking->check_out->format('M d') : '-' }}">
                                     @if($status['is_start'] ?? false)
                                         <span class="booking-guest">{{ Str::limit($booking->guest->full_name ?? 'Guest', 10) }}</span>
                                     @endif

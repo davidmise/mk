@@ -348,18 +348,90 @@ class SettingsController extends Controller
     }
 
     /**
+     * Update hero slider settings.
+     */
+    public function updateHeroSlidesSettings(Request $request)
+    {
+        $request->validate([
+            'slider_interval' => 'nullable|integer|min:1|max:30',
+            'slider_effect' => 'nullable|string|max:50',
+            'slider_autoplay' => 'nullable|boolean',
+        ]);
+
+        foreach ($request->except(['_token', '_method']) as $key => $value) {
+            SiteSetting::updateOrCreate(
+                ['key' => $key],
+                ['value' => $value, 'type' => 'text']
+            );
+        }
+
+        Cache::forget('site_settings');
+        ActivityLog::log('updated', 'Updated hero slider settings');
+
+        return back()->with('success', 'Slider settings updated successfully.');
+    }
+
+    /**
+     * Update all social links at once.
+     */
+    public function updateAllSocialLinks(Request $request)
+    {
+        $request->validate([
+            'links' => 'nullable|array',
+            'links.*.platform' => 'required|string|max:50',
+            'links.*.url' => 'required|url|max:255',
+            'links.*.is_active' => 'boolean',
+        ]);
+
+        // Update existing links
+        if ($request->has('links')) {
+            foreach ($request->links as $id => $linkData) {
+                $link = SocialLink::find($id);
+                if ($link) {
+                    $link->update([
+                        'platform' => $linkData['platform'],
+                        'url' => $linkData['url'],
+                        'is_active' => isset($linkData['is_active']) && $linkData['is_active'],
+                    ]);
+                }
+            }
+        }
+
+        ActivityLog::log('updated', 'Updated social links');
+
+        return back()->with('success', 'Social links updated successfully.');
+    }
+
+    /**
      * Clear cache.
      */
-    public function clearCache()
+    public function clearCache(Request $request)
     {
-        Artisan::call('cache:clear');
-        Artisan::call('view:clear');
-        Artisan::call('route:clear');
-        Artisan::call('config:clear');
+        $type = $request->input('type', 'all');
 
-        ActivityLog::log('maintenance', 'Cleared application cache');
+        switch ($type) {
+            case 'application':
+                Artisan::call('cache:clear');
+                break;
+            case 'views':
+                Artisan::call('view:clear');
+                break;
+            case 'routes':
+                Artisan::call('route:clear');
+                break;
+            case 'config':
+                Artisan::call('config:clear');
+                break;
+            default:
+                Artisan::call('cache:clear');
+                Artisan::call('view:clear');
+                Artisan::call('route:clear');
+                Artisan::call('config:clear');
+        }
 
-        return back()->with('success', 'Cache cleared successfully.');
+        ActivityLog::log('maintenance', "Cleared {$type} cache");
+
+        return back()->with('success', ucfirst($type) . ' cache cleared successfully.');
     }
 
     /**

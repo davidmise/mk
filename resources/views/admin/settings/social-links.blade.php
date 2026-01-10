@@ -24,7 +24,7 @@
     </div>
 
     <div class="col-9">
-        <form action="{{ route('admin.settings.social-links.update') }}" method="POST">
+        <form action="{{ route('admin.settings.social-links.update-all') }}" method="POST">
             @csrf
             @method('PUT')
 

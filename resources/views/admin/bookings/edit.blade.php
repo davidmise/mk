@@ -89,9 +89,9 @@
                         <div class="col-6">
                             <div class="form-group">
                                 <label class="form-label">Check-in Date <span class="text-danger">*</span></label>
-                                <input type="date" name="check_in_date" id="checkInDate" class="form-control @error('check_in_date') is-invalid @enderror"
-                                       value="{{ old('check_in_date', $booking->check_in_date->format('Y-m-d')) }}" required>
-                                @error('check_in_date')
+                                <input type="date" name="check_in" id="checkInDate" class="form-control @error('check_in') is-invalid @enderror"
+                                       value="{{ old('check_in', $booking->check_in ? $booking->check_in->format('Y-m-d') : '') }}" required>
+                                @error('check_in')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -99,9 +99,9 @@
                         <div class="col-6">
                             <div class="form-group">
                                 <label class="form-label">Check-out Date <span class="text-danger">*</span></label>
-                                <input type="date" name="check_out_date" id="checkOutDate" class="form-control @error('check_out_date') is-invalid @enderror"
-                                       value="{{ old('check_out_date', $booking->check_out_date->format('Y-m-d')) }}" required>
-                                @error('check_out_date')
+                                <input type="date" name="check_out" id="checkOutDate" class="form-control @error('check_out') is-invalid @enderror"
+                                       value="{{ old('check_out', $booking->check_out ? $booking->check_out->format('Y-m-d') : '') }}" required>
+                                @error('check_out')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>

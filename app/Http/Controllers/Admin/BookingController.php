@@ -309,11 +309,17 @@ class BookingController extends Controller
     public function confirm(Booking $booking)
     {
         if ($booking->status !== Booking::STATUS_PENDING) {
+            if (request()->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Only pending bookings can be confirmed.']);
+            }
             return back()->with('error', 'Only pending bookings can be confirmed.');
         }
 
         $booking->confirm();
 
+        if (request()->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Reservation has been confirmed!']);
+        }
         return back()->with('success', 'Reservation has been confirmed.');
     }
 
@@ -323,17 +329,23 @@ class BookingController extends Controller
     public function checkIn(Request $request, Booking $booking)
     {
         if (!in_array($booking->status, [Booking::STATUS_PENDING, Booking::STATUS_CONFIRMED])) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Cannot check in this booking.']);
+            }
             return back()->with('error', 'Cannot check in this booking.');
         }
 
-        $request->validate([
-            'room_id' => 'required|exists:rooms,id',
-        ]);
+        // If room_id provided, use it; otherwise use existing room
+        $roomId = $request->room_id ?? $booking->room_id;
 
-        // Verify room is available
-        $room = Room::find($request->room_id);
-        if ($room->status !== Room::STATUS_AVAILABLE) {
-            return back()->with('error', 'Selected room is not available.');
+        if ($roomId) {
+            $room = Room::find($roomId);
+            if ($room && $room->status !== Room::STATUS_AVAILABLE && $room->id !== $booking->room_id) {
+                if ($request->ajax()) {
+                    return response()->json(['success' => false, 'message' => 'Selected room is not available.']);
+                }
+                return back()->with('error', 'Selected room is not available.');
+            }
         }
 
         // Confirm booking first if pending
@@ -344,8 +356,11 @@ class BookingController extends Controller
             ]);
         }
 
-        $booking->checkIn($request->room_id);
+        $booking->checkIn($roomId);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Guest has been checked in successfully!']);
+        }
         return back()->with('success', 'Guest has been checked in successfully.');
     }
 
@@ -355,16 +370,26 @@ class BookingController extends Controller
     public function checkOut(Booking $booking)
     {
         if ($booking->status !== Booking::STATUS_CHECKED_IN) {
+            if (request()->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Only in-house guests can be checked out.']);
+            }
             return back()->with('error', 'Only in-house guests can be checked out.');
         }
 
         // Check if there's balance due
         if ($booking->balance_due > 0) {
-            return back()->with('error', "Cannot check out. Outstanding balance: " . number_format($booking->balance_due, 2));
+            $message = "Cannot check out. Outstanding balance: TZS " . number_format($booking->balance_due, 0);
+            if (request()->ajax()) {
+                return response()->json(['success' => false, 'message' => $message]);
+            }
+            return back()->with('error', $message);
         }
 
         $booking->checkOut();
 
+        if (request()->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Guest has been checked out successfully!']);
+        }
         return back()->with('success', 'Guest has been checked out successfully.');
     }
 

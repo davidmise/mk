@@ -16,11 +16,11 @@
             </div>
 
             <div class="form-group">
-                <input type="email" name="guest_email" placeholder="Email Address">
+                <input type="email" name="guest_email" placeholder="Email Address (Optional)">
             </div>
 
             <div class="form-group">
-                <input type="tel" name="guest_phone" placeholder="Phone Number" required pattern="[0-9+ ]{6,15}">
+                <input type="tel" name="guest_phone" placeholder="Phone Number *" required pattern="[0-9+ ]{6,15}">
             </div>
 
             <div class="form-group">
@@ -208,17 +208,16 @@ document.addEventListener('DOMContentLoaded', function () {
             let errors = [];
             let isValid = true;
 
-            const fields = [
-                { id: 'name', label: 'Name' },
-                { id: 'email', label: 'Email' },
-                { id: 'phone', label: 'Phone' },
-                { id: 'check_in', label: 'Check-in date' },
-                { id: 'check_out', label: 'Check-out date' },
-                { id: 'room_type_id', label: 'Room type' },
+            const requiredFields = [
+                { name: 'guest_name', label: 'Name' },
+                { name: 'guest_phone', label: 'Phone number' },
+                { name: 'check_in', label: 'Check-in date' },
+                { name: 'check_out', label: 'Check-out date' },
+                { name: 'room_type_id', label: 'Room type' },
             ];
 
-            fields.forEach(field => {
-                const input = document.getElementById(field.id) || document.querySelector(`[name="${field.id}"]`);
+            requiredFields.forEach(field => {
+                const input = document.querySelector(`[name="${field.name}"]`);
                 if (input && !input.value.trim()) {
                     input.classList.add('input-error');
                     errors.push(`${field.label} is required.`);

@@ -447,15 +447,18 @@ Route::middleware(['admin.auth'])->group(function () {
 
         // Hero slides
         Route::post('settings/hero-slides', [SettingsController::class, 'storeHeroSlide'])->name('admin.settings.hero-slides.store');
+        Route::put('settings/hero-slides/settings', [SettingsController::class, 'updateHeroSlidesSettings'])->name('admin.settings.hero-slides.settings');
         Route::put('settings/hero-slides/{slide}', [SettingsController::class, 'updateHeroSlide'])->name('admin.settings.hero-slides.update');
         Route::delete('settings/hero-slides/{slide}', [SettingsController::class, 'deleteHeroSlide'])->name('admin.settings.hero-slides.destroy');
 
         // Social links
         Route::post('settings/social-links', [SettingsController::class, 'storeSocialLink'])->name('admin.settings.social-links.store');
+        Route::put('settings/social-links/update-all', [SettingsController::class, 'updateAllSocialLinks'])->name('admin.settings.social-links.update-all');
         Route::put('settings/social-links/{link}', [SettingsController::class, 'updateSocialLink'])->name('admin.settings.social-links.update');
         Route::delete('settings/social-links/{link}', [SettingsController::class, 'deleteSocialLink'])->name('admin.settings.social-links.destroy');
 
-        // Maintenance
+        // Maintenance/Cache
+        Route::post('settings/cache-clear', [SettingsController::class, 'clearCache'])->name('admin.settings.cache.clear');
         Route::post('settings/clear-cache', [SettingsController::class, 'clearCache'])->name('admin.settings.clear-cache');
         Route::post('settings/clear-logs', [SettingsController::class, 'clearLogs'])->name('admin.settings.clear-logs');
     });

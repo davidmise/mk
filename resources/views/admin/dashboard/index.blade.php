@@ -278,10 +278,10 @@
                                 <td>{{ $booking->guest?->full_name ?? $booking->guest_name }}</td>
                                 <td>{{ $booking->roomType->name ?? '-' }}</td>
                                 <td>
-                                    {{ $booking->check_in_date->format('M d') }} - {{ $booking->check_out_date->format('M d') }}
+                                    {{ $booking->check_in ? $booking->check_in->format('M d') : '-' }} - {{ $booking->check_out ? $booking->check_out->format('M d') : '-' }}
                                     <div class="text-muted" style="font-size: 0.75rem;">{{ $booking->total_nights }} nights</div>
                                 </td>
-                                <td>${{ number_format($booking->total_amount, 2) }}</td>
+                                <td>TZS {{ number_format($booking->total_price ?? 0, 0) }}</td>
                                 <td>
                                     @switch($booking->status)
                                         @case('pending')

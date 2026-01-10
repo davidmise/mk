@@ -18,9 +18,9 @@
         <a href="{{ route('admin.calendar.index') }}" class="btn btn-secondary">
             <i class="fas fa-calendar"></i> Calendar View
         </a>
-        <a href="{{ route('admin.bookings.create') }}" class="btn btn-primary">
+        <button type="button" onclick="openQuickBookingModal()" class="btn btn-primary">
             <i class="fas fa-plus"></i> New Booking
-        </a>
+        </button>
     </div>
 </div>
 
@@ -180,13 +180,13 @@
                             @endif
                         </td>
                         <td>
-                            {{ $booking->check_in_date->format('M d, Y') }}
-                            @if($booking->check_in_date->isToday())
+                            {{ $booking->check_in ? $booking->check_in->format('M d, Y') : '-' }}
+                            @if($booking->check_in && $booking->check_in->isToday())
                                 <span class="badge badge-success" style="font-size: 0.625rem;">Today</span>
                             @endif
                         </td>
                         <td>
-                            {{ $booking->check_out_date->format('M d, Y') }}
+                            {{ $booking->check_out ? $booking->check_out->format('M d, Y') : '-' }}
                             <div class="text-muted" style="font-size: 0.75rem;">
                                 {{ $booking->total_nights }} nights
                             </div>
@@ -198,11 +198,11 @@
                             @endif
                         </td>
                         <td>
-                            <strong>${{ number_format($booking->total_amount, 2) }}</strong>
-                            @php $balance = $booking->total_amount - $booking->paid_amount @endphp
+                            <strong>TZS {{ number_format($booking->total_price ?? 0, 0) }}</strong>
+                            @php $balance = ($booking->total_price ?? 0) - ($booking->amount_paid ?? 0) @endphp
                             @if($balance > 0)
                                 <div class="text-danger" style="font-size: 0.75rem;">
-                                    Due: ${{ number_format($balance, 2) }}
+                                    Due: TZS {{ number_format($balance, 0) }}
                                 </div>
                             @else
                                 <div class="text-success" style="font-size: 0.75rem;">Paid</div>
@@ -237,7 +237,7 @@
                                 </a>
 
                                 @if($booking->status === 'pending')
-                                    <form action="{{ route('admin.bookings.confirm', $booking) }}" method="POST" style="display: inline;">
+                                    <form action="{{ route('admin.bookings.confirm', $booking) }}" method="POST" style="display: inline;" class="ajax-status-form">
                                         @csrf
                                         <button type="submit" class="btn btn-sm btn-success btn-icon" title="Confirm">
                                             <i class="fas fa-check"></i>
@@ -246,7 +246,7 @@
                                 @endif
 
                                 @if($booking->status === 'confirmed')
-                                    <form action="{{ route('admin.bookings.check-in', $booking) }}" method="POST" style="display: inline;">
+                                    <form action="{{ route('admin.bookings.check-in', $booking) }}" method="POST" style="display: inline;" class="ajax-status-form">
                                         @csrf
                                         <button type="submit" class="btn btn-sm btn-primary btn-icon" title="Check In">
                                             <i class="fas fa-sign-in-alt"></i>
@@ -255,7 +255,7 @@
                                 @endif
 
                                 @if($booking->status === 'checked_in')
-                                    <form action="{{ route('admin.bookings.check-out', $booking) }}" method="POST" style="display: inline;">
+                                    <form action="{{ route('admin.bookings.check-out', $booking) }}" method="POST" style="display: inline;" class="ajax-status-form">
                                         @csrf
                                         <button type="submit" class="btn btn-sm btn-warning btn-icon" title="Check Out">
                                             <i class="fas fa-sign-out-alt"></i>
@@ -288,4 +288,92 @@
     </div>
     @endif
 </div>
+
+<!-- Toast Notification -->
+<div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
+@include('admin.bookings._quick-booking-modal')
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toast notification function
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast-notification toast-${type}`;
+        toast.innerHTML = `
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+            <span>${message}</span>
+        `;
+        toast.style.cssText = `
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 20px;
+            background: ${type === 'success' ? '#28a745' : '#dc3545'};
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            margin-bottom: 10px;
+            animation: slideIn 0.3s ease;
+        `;
+
+        document.getElementById('toast-container').appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // AJAX form submission for status changes
+    document.querySelectorAll('.ajax-status-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const button = form.querySelector('button');
+            const originalHtml = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            button.disabled = true;
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: new FormData(form)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(data.message || 'Status updated successfully!', 'success');
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    showToast(data.message || 'Operation failed', 'error');
+                    button.innerHTML = originalHtml;
+                    button.disabled = false;
+                }
+            })
+            .catch(error => {
+                showToast('An error occurred. Please try again.', 'error');
+                button.innerHTML = originalHtml;
+                button.disabled = false;
+            });
+        });
+    });
+});
+</script>
+<style>
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+</style>
+@endpush

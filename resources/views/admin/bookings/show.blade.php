@@ -86,7 +86,7 @@
                                 </div>
                                 <div>
                                     <span class="badge badge-success" style="font-size: 0.875rem; padding: 0.375rem 0.75rem;">Confirmed</span>
-                                    <p class="text-muted mb-0 mt-1">Ready for check-in on {{ $booking->check_in_date->format('M d, Y') }}</p>
+                                    <p class="text-muted mb-0 mt-1">Ready for check-in on {{ $booking->check_in ? $booking->check_in->format('M d, Y') : '-' }}</p>
                                 </div>
                                 @break
                             @case('checked_in')
@@ -107,7 +107,7 @@
                                 </div>
                                 <div>
                                     <span class="badge badge-secondary" style="font-size: 0.875rem; padding: 0.375rem 0.75rem;">Checked Out</span>
-                                    <p class="text-muted mb-0 mt-1">Completed on {{ $booking->actual_check_out?->format('M d, Y h:i A') ?? $booking->check_out_date->format('M d, Y') }}</p>
+                                    <p class="text-muted mb-0 mt-1">Completed on {{ $booking->checked_out_at?->format('M d, Y h:i A') ?? ($booking->check_out ? $booking->check_out->format('M d, Y') : '-') }}</p>
                                 </div>
                                 @break
                             @case('cancelled')
@@ -140,14 +140,14 @@
                     <div class="col-4">
                         <div class="mb-3">
                             <div class="text-muted" style="font-size: 0.75rem; margin-bottom: 0.25rem;">CHECK-IN</div>
-                            <strong style="font-size: 1.125rem;">{{ $booking->check_in_date->format('M d, Y') }}</strong>
+                            <strong style="font-size: 1.125rem;">{{ $booking->check_in ? $booking->check_in->format('M d, Y') : '-' }}</strong>
                             <div class="text-muted">After 2:00 PM</div>
                         </div>
                     </div>
                     <div class="col-4">
                         <div class="mb-3">
                             <div class="text-muted" style="font-size: 0.75rem; margin-bottom: 0.25rem;">CHECK-OUT</div>
-                            <strong style="font-size: 1.125rem;">{{ $booking->check_out_date->format('M d, Y') }}</strong>
+                            <strong style="font-size: 1.125rem;">{{ $booking->check_out ? $booking->check_out->format('M d, Y') : '-' }}</strong>
                             <div class="text-muted">Before 11:00 AM</div>
                         </div>
                     </div>
