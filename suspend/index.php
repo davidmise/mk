@@ -2,7 +2,7 @@
 // Configuration
 $siteName = "MK Hotel";
 $domain = "mkhotel.co.tz";
-$providerName = "Pamoja Inc";
+$providerName = "Pamoja INC";
 $providerUrl = "https://pamojainc.co.tz";
 $currentYear = date("Y");
 ?>
